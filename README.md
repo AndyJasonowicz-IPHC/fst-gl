@@ -25,11 +25,9 @@ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 
 
 ### Build Instructions
-```bash
-nim build 
-```
+Run ```nim build``` to compile into an executable binary. 
 
-You can run ```nim clean``` to clean the build environment
+You can run ```nim clean``` to clean the build environment.
 
 #### Build Notes:
 HTSlib needs to be accessible on ```$LD_LIBRARY_PATH```. This can cause problems if it is 
