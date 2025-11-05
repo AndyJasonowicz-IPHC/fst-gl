@@ -2,11 +2,10 @@
 
 A program to parse vcf/bcf files and estimate allele frequencies and fst using genotype likelihoods (PL).
 
-
-USER REQUIREMENTS:
+## Installation
+### Prerequisites:
 * clang
 * OpenMP
-* GCC
 * nim 
 
 Install required libraries using your package manager.
@@ -14,33 +13,34 @@ Install required libraries using your package manager.
 dnf install -y clang libgomp 
 ```
 
-Install nim 
+Install Nim following the instructions here https://nim-lang.org/install_unix.html.
 ```bash
 curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 ```
 
-Nim Libraries:
+#### Required Nim Libraries:
 * zip/gzipfiles
 * hts
 * Therapist
 
 
-to build 
+### Build Instructions
 ```bash
 nim build 
 ```
 
-to remove library run ```nim clean```
+You can run ```nim clean``` to clean the build environment
 
-HTSlib needs to be accessible on $LD_LIBRARY_PATH but this can cause problems if it is 
-installed in a conda env becasue it may cause conflicts with system gcc and libstdc++. 
-Here is one solution to this.
+#### Build Notes:
+HTSlib needs to be accessible on ```$LD_LIBRARY_PATH```. This can cause problems if it is 
+installed in a conda environment because it may cause conflicts with system gcc and libstdc++.  
+Here is one solution to this. We simply add the relevant path from our conda environment to ```$LD_LIBRARY_PATH```.
 ```bash
 export LD_LIBRARY_PATH=/lib64:~/micromamba/envs/$CONDA_DEFAULT_ENV/lib/
 ```
 
 
-### Program usage
+## Program usage
 ```bash
 fst-gl --help
 ```
