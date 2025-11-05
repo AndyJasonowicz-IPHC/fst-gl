@@ -8,7 +8,7 @@ A program to parse vcf/bcf files and estimate allele frequencies and fst using g
 * OpenMP
 * nim 
 
-Install required libraries using your package manager.
+Install required libraries using your Linux distribution's package manager. For RPM based systems run - 
 ```bash 
 dnf install -y clang libgomp 
 ```
