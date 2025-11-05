@@ -1,6 +1,6 @@
 # fst-gl
 
-A program to parse vcf/bcf files and estimate allele frequencies and fst using genotype likelihoods (PL).
+A program to parse vcf/bcf files and estimate allele frequencies and fst using Phred-scaled genotype likelihoods (PL).
 
 ## Installation
 ### Prerequisites:
@@ -8,7 +8,7 @@ A program to parse vcf/bcf files and estimate allele frequencies and fst using g
 * OpenMP
 * nim 
 
-Install required libraries using your Linux distribution's package manager. For RPM based systems run - 
+Install the prerequisites using your Linux distribution's package manager. For RPM based systems run.
 ```bash 
 dnf install -y clang libgomp 
 ```
@@ -25,7 +25,7 @@ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 
 
 ### Build Instructions
-Run ```nim build``` to compile into an executable binary. 
+Run ```nim build``` to compile an executable binary ```bin/fst-gl```.  
 
 You can run ```nim clean``` to clean the build environment.
 
