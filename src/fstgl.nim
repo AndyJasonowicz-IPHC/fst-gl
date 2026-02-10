@@ -34,11 +34,7 @@ type
                     a: float,
                     b: float,
                     c: float, 
-                    aNoCorr: float,
-                    bNoCorr: float,
-                    cNoCorr: float,
                     fst: float,
-                    fstNoCorr :float
                     ]
 
 type
@@ -173,7 +169,7 @@ proc maf_em(beagle_gl: seq[seq[float64]], tol=1e-20, max_iter=200, random_starts
     return res
 
 
-proc fst_wc_outflank(pfreqs: seq[float64], hfreqs: seq[float64], ns: seq[int]): FST_OUT =  
+proc fst_wc(pfreqs: seq[float64], hfreqs: seq[float64], ns: seq[int]): FST_OUT =  
     var n_pops = float(len(ns))
     var n_ave = sum(ns)/len(ns)
     var p_ave = sum(pfreqs)/float(len(pfreqs))
@@ -194,12 +190,7 @@ proc fst_wc_outflank(pfreqs: seq[float64], hfreqs: seq[float64], ns: seq[int]): 
     var b=n_ave/(n_ave-1)*(p_ave*(1-p_ave) - (n_pops-1)/n_pops*s2 - (2*n_ave - 1)/(4*n_ave)*h_ave)
     var c=1/2*h_ave
     
-    var aNoCorr = n_ave/n_c*(s2)
-    var bNoCorr = (p_ave*(1-p_ave) - (n_pops-1)/n_pops*s2 - (2*n_ave)/(4*n_ave)*h_ave)
-    var cNoCorr = 1/2*h_ave
-
     var fst = a/(a+b+c) 
-    var fstNoCorr = aNoCorr/(aNoCorr+bNoCorr+cNoCorr)
 
     var res: FST_OUT
     res = (n_pops: n_pops, 
@@ -212,18 +203,15 @@ proc fst_wc_outflank(pfreqs: seq[float64], hfreqs: seq[float64], ns: seq[int]): 
                 a: a,
                 b: b,
                 c: c, 
-                aNoCorr: aNoCorr,
-                bNoCorr: bNoCorr,
-                cNoCorr: cNoCorr,
                 fst: fst,
-                fstNoCorr : fstNoCorr
                 )
     return res
 
 
 
-proc formatFstOut(v: Variant, fst: FST_OUT, valid: bool, p: float64, good: int, precision: int=6): string =
-    var lineout = "{v.CHROM}\t{v.POS}\t{fst.he.formatFloat(ffDecimal, precision)}\t{fst.fst.formatFloat(ffDecimal, precision)}\t{fst.a.formatFloat(ffDecimal, precision)}\t{(fst.a + fst.b + fst.c).formatFloat(ffDecimal, precision)}\t{fst.fstNoCorr.formatFloat(ffDecimal, precision)}\t{fst.aNoCorr.formatFloat(ffDecimal, precision)}\t{(fst.aNoCorr + fst.bNoCorr + fst.cNoCorr).formatFloat(ffDecimal, precision)}\t{fst.p_ave.formatFloat(ffDecimal, precision)}\t{valid}".fmt
+
+proc formatFstOut(v: Variant, fst: FST_OUT, converged: bool, p: float64, good: int, precision: int=6): string =
+    var lineout = "{v.CHROM}\t{v.POS}\t{fst.fst.formatFloat(ffDecimal, precision)}\t{fst.a.formatFloat(ffDecimal, precision)}\t{(fst.a + fst.b + fst.c).formatFloat(ffDecimal, precision)}\t{converged}".fmt
     if -99.9 < p:
         lineout = lineout & "\t{p.formatFloat(ffDecimal, precision)}\t{good}".fmt
 
@@ -283,7 +271,7 @@ proc boot_fst(glsr_rec: seq[seq[float]], v:Variant, pop_vec: seq[string], pop_la
         hfreqs[ix]=mle_af.gf[1]
 
     ## estimate fst
-    var fst_out=fst_wc_outflank(pfreqs, hfreqs, ns)
+    var fst_out=fst_wc(pfreqs, hfreqs, ns)
     if convergence:
         fst = fst_out.fst
     else:
@@ -384,7 +372,7 @@ proc processRecord(v: Variant,
         hfreqs[ix]=mle_af.gf[1]
                                          
     ## estimate fst
-    var fst_out=fst_wc_outflank(pfreqs, hfreqs, ns)
+    var fst_out=fst_wc(pfreqs, hfreqs, ns)
     var fst: float64                            
     if convergence:
         fst = fst_out.fst
@@ -429,13 +417,13 @@ proc wgsFst(bcf: string,
     doAssert(open(v, bcf))
 
     let strm_fst = newGzFileStream("{out_prefix}-fst.txt.gz".fmt, fmWrite)
-    var header= "chrom\tpos\the\tfst\tt1\tt2\tfstNoCorr\tt1NoCorr\tt2NoCorr\tmeanAlleleFreq\tvalid"
+    var header= "chrom\tpos\tfst\ta\tabc\tall_converged"
     if 0 < nboots:
-        header = header & "\tp\tvalid_boots"
+        header = header & "\tp\tconverged_boots"
     strm_fst.writeLine(header)
 
     let strm_af = newGzFileStream("{out_prefix}-af.txt.gz".fmt, fmWrite)
-    var headeraf= "chrom\tpos\tpop\tn\tngood\tmleaf\tmlegf\tvalid\tn_iter\tstarts"
+    var headeraf= "chrom\tpos\tpop\tn\tngood\tmleaf\tmlegf\tconverged\tn_iter\tstarts"
     strm_af.writeLine(headeraf)
 
     ## --- Parse population file and set samples
@@ -580,19 +568,19 @@ when isMainModule:
     # The parser is specified as a tuple
     let spec = (
         # Name is a positional argument, by virtue of being surrounded by < and >
-        bcf: newStringArg(@["<BCF>"], help="BCF/VCF file to read"),
+        bcf: newStringArg(@["<BCF>"], help="bcf/vcf.gz/vcf file to read"),
         # --times is an optional argument, by virtue of starting with - and/or --
-        popfile: newStringArg(@["-p", "--popFile"], help="File contining sample names and population labels"),
+        popfile: newStringArg(@["-p", "--pop-file"], help="File contining sample names and population labels"),
         out_prefix: newStringArg(@["-o", "--output"], help="Prefix for output files", defaultVal="out"),
         region: newStringArg(@["-r", "--region"], help="Specify a region to process [chr]:[start-stop].", defaultVal="*"),
-        remove_missing: newFlagArg(@["-m", "--removeMissing"], help="Remove samples with missing data? Requires DP field in BCF. [default: false]"),
-        random_starts: newFlagArg(@["-s", "--randomStarts"], help="Use random starting values for EM algorithm? [default: false]"),
+        remove_missing: newFlagArg(@["-m", "--remove-missing"], help="Remove samples with missing data? Requires DP field in BCF. [default: false]"),
+        random_starts: newFlagArg(@["-s", "--random-starts"], help="Use random starting values for EM algorithm? [default: false]"),
         nboots: newIntArg(@["-b", "--boots"], help="Number of bootstrap resamplings", defaultVal=0),
         replace: newFlagArg(@["--replace"], help="Perform re-sampling with replacement? [default: false]"),
         threads: newIntArg(@["-t", "--threads"], help="Number of threads to use in parallel sections of code.", defaultVal=1),
-        n_snps: newIntArg(@["-c", "--chunkSize"], help="Number of SNPs to read into memory at a time.", defaultVal=50000),
-        em_tol: newFloatArg(@["--emTol"], help="Tolerance required for stopping EM estimation of allele frequencies.", defaultVal=1e-8),
-        max_iter: newIntArg(@["--maxIter"], help="Maximum iterations allowed for EM estimation of allele frequencies.", defaultVal=200),
+        n_snps: newIntArg(@["-c", "--chunk-size"], help="Number of SNPs to read into memory at a time.", defaultVal=50000),
+        em_tol: newFloatArg(@["--em-tol"], help="Tolerance required for stopping EM estimation of allele frequencies.", defaultVal=1e-8),
+        max_iter: newIntArg(@["--max-iter"], help="Maximum iterations allowed for EM estimation of allele frequencies.", defaultVal=200),
         verbosity: newCountArg(@["-v", "--verbose"], help="Verbose. Can be specified multiple times for more detailed output."),
         # --version will cause 0.1.0 to be printed
         version: newMessageArg(@["--version"], "0.0.1", help="Prints version"),
@@ -619,17 +607,17 @@ when isMainModule:
 
 
     echo "Processing BCF {spec.bcf.value} with the following options:".fmt
-    echo "\t--popFile={spec.popfile.value}".fmt
+    echo "\t--pop-file={spec.popfile.value}".fmt
     echo "\t--output={spec.out_prefix.value}".fmt
     echo "\t--region={spec.region.value}".fmt
-    echo "\t--removeMissing={spec.remove_missing.count} ({remove_missing})".fmt
-    echo "\t--randomStarts={spec.random_starts.count} ({random_starts})".fmt
+    echo "\t--remove-missing={spec.remove_missing.count} ({remove_missing})".fmt
+    echo "\t--random-starts={spec.random_starts.count} ({random_starts})".fmt
     echo "\t--boots={spec.nboots.value}".fmt
     echo "\t--replace={spec.replace.count} ({replace})".fmt
     echo "\t--threads={spec.threads.value}".fmt
-    echo "\t--chunkSize={spec.n_snps.value}".fmt
-    echo "\t--emTol={spec.em_tol.value}".fmt
-    echo "\t--maxIter={spec.max_iter.value}".fmt
+    echo "\t--chunk-size={spec.n_snps.value}".fmt
+    echo "\t--em-tol={spec.em_tol.value}".fmt
+    echo "\t--max-iter={spec.max_iter.value}".fmt
     echo "\t--verbose={spec.verbosity.count}".fmt
 
 
