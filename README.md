@@ -104,13 +104,14 @@ chr1   13784  0.043413  0.010670  0.245771  true
 chr1   14320  0.044174  0.010873  0.246148  true
 chr1   16535  0.345063  0.088364  0.256080  true
 ```
-
-chrom - chromosome 
-pos - position on chromosome
-fst - fst estimate
-a - numerator a eqn 2 
-abc - denominator a+b+c eqn 2 - 4
-all_converged - did the EM algorithm converge for all populations?
+|Column | Description| 
+|---|---|
+|chrom | chromosome  |
+|pos | position on chromosome   |
+|fst | fst estimate  |
+|a | numerator a eqn 2   |
+|abc | denominator a+b+c eqn 2 - 4  |
+|all_converged | did the EM algorithm converge for all populations?  |
 
 
 ```
@@ -129,13 +130,15 @@ chr1   7643  p1   50  50     0.180312  0.679655,0.280066,0.040279  true       3 
 chr1   7643  p2   50  50     0.000000  1.000000,0.000000,0.000000  true       3       0.333333,0.333333,0.333333
 ```
 
-chrom - chromosome 
-pos - position on chromosome
-pop - population
-n - number of individuals used for estimation
-ngood - number of individuals with data
-mleaf - estimated allele frequencies
-mlegf - estimated genotype frequencies HomRef,Het,HomAlt
-converged - did the EM algorithm converge?
-n_iter - number of iterations until convergence
-starts - starting values for EM algorithm
+|Column | Description| 
+|---|---|
+|chrom | chromosome  |
+|pos | position on chromosome  | 
+|pop | population   |
+|n | number of individuals used for estimation   |
+|ngood | number of individuals with data   |
+|mleaf | estimated allele frequencies   |
+|mlegf | estimated genotype frequencies HomRef,Het,HomAlt   |
+|converged | did the EM algorithm converge?   |
+|n_iter | number of iterations until convergence   |
+|starts | starting values for EM algorithm   |
