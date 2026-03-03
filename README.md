@@ -137,7 +137,7 @@ chr1   7643  p2   50  50     0.000000  1.000000,0.000000,0.000000  true       3 
 |pop | population   |
 |n | number of individuals used for estimation   |
 |ngood | number of individuals with data   |
-|mleaf | estimated allele frequencies   |
+|mleaf | estimated allele frequency (ALT)   |
 |mlegf | estimated genotype frequencies HomRef,Het,HomAlt   |
 |converged | did the EM algorithm converge?   |
 |n_iter | number of iterations until convergence   |

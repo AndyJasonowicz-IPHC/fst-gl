@@ -211,7 +211,7 @@ proc fst_wc(pfreqs: seq[float64], hfreqs: seq[float64], ns: seq[int]): FST_OUT =
 
 
 proc formatFstOut(v: Variant, fst: FST_OUT, converged: bool, p: float64, good: int, precision: int=6): string =
-    var lineout = "{v.CHROM}\t{v.POS}\t{fst.fst.formatFloat(ffDecimal, precision)}\t{fst.a.formatFloat(ffDecimal, precision)}\t{(fst.a + fst.b + fst.c).formatFloat(ffDecimal, precision)}\t{converged}".fmt
+    var lineout = "{v.CHROM}\t{v.POS}\t{fst.fst.formatFloat(ffDecimal, precision)}\t{fst.a.formatFloat(ffDecimal, precision)}\t{fst.b.formatFloat(ffDecimal, precision)}\t{fst.c.formatFloat(ffDecimal, precision)}\t{converged}".fmt
     if -99.9 < p:
         lineout = lineout & "\t{p.formatFloat(ffDecimal, precision)}\t{good}".fmt
 
@@ -417,7 +417,7 @@ proc wgsFst(bcf: string,
     doAssert(open(v, bcf))
 
     let strm_fst = newGzFileStream("{out_prefix}-fst.txt.gz".fmt, fmWrite)
-    var header= "chrom\tpos\tfst\ta\tabc\tall_converged"
+    var header= "chrom\tpos\tfst\ta\tb\tc\tall_converged"
     if 0 < nboots:
         header = header & "\tp\tconverged_boots"
     strm_fst.writeLine(header)
