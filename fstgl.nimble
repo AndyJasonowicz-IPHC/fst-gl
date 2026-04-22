@@ -9,5 +9,4 @@ requires "hts >= 0.3.22"
 requires "zip"
 requires "therapist"
 
-
-bin = @["src/glUtils"]
+bin = @["src/fst-gl"]

@@ -1,0 +1,117 @@
+Bootstrap: docker
+From: almalinux:8
+
+%post
+    set -euxo pipefail
+
+    dnf -y update
+    dnf -y install dnf-plugins-core
+    dnf config-manager --set-enabled crb || true
+    dnf config-manager --set-enabled powertools || true
+
+    dnf -y install \
+        which \
+        findutils \
+        util-linux \
+        rsync \
+        clang
+
+
+    dnf -y install zlib-static 
+    dnf -y install \
+        gcc gcc-c++ make cmake \
+        autoconf automake libtool \
+        git curl tar gzip xz \
+        zlib-devel bzip2-devel xz-devel \
+        perl pkgconfig \
+        libomp libomp-devel
+
+    dnf clean all
+
+    export ROOT=/tmp
+    mkdir -p "$ROOT"
+
+    cd $ROOT
+
+    # libbz2.a
+    dnf install -y bzip2 bzip2-devel make gcc
+    curl -L https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz | tar xz
+    cd bzip2-1.0.8
+    make libbz2.a
+    cp libbz2.a /usr/lib64/
+    cd $ROOT && rm -rf bzip2-1.0.8
+
+    # liblzma.a
+    dnf install -y xz xz-devel
+    curl -L https://tukaani.org/xz/xz-5.4.6.tar.gz | tar xz
+    cd xz-5.4.6
+    ./configure --enable-static --disable-shared
+    make
+    cp src/liblzma/.libs/liblzma.a /usr/lib64/
+    cd $ROOT && rm -rf xz-5.4.6
+
+    ## Build libdeflate
+    cd $ROOT
+    rm -rf libdeflate || true
+    git clone https://github.com/ebiggers/libdeflate.git
+    cd libdeflate 
+    git checkout v1.25 
+    cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build build
+    cmake --install build
+
+
+    ## build hts-lib
+    cd $ROOT
+    rm -rf htslib || true
+    git clone https://github.com/samtools/htslib.git
+    cd htslib
+    git checkout 1.23.1   # stable version recommended
+    git submodule update --init --recursive
+    autoreconf -i
+    ./configure --prefix=/usr \
+                --disable-libcurl \
+                --with-libdeflate \
+                CPPFLAGS="-I/usr/include" \
+                LDFLAGS="-L/usr/lib64"
+    make && make install
+
+
+    cd $ROOT
+    rm -rf Nim || true
+    export NIM_PREFIX=/opt/nim
+    git clone https://github.com/nim-lang/Nim.git
+    cd Nim
+    git checkout v2.2.4   # or whatever version you want
+
+    sh build_all.sh
+    bin/nim c koch
+    ./koch boot -d:release
+    ./koch install /opt
+
+    mkdir -p $NIM_PREFIX
+    rsync -av bin/ $NIM_PREFIX/bin/
+    rsync -av lib/ $NIM_PREFIX/lib/
+
+    export PATH=$NIM_PREFIX/bin:$PATH
+
+    export NIM_PATH=$NIM_PREFIX/lib
+    export NIM_LIB_PREFIX=$NIM_PREFIX/lib
+    export NIMBLE_PATH=$NIM_PREFIX
+
+    cd $ROOT
+    cd ~/
+    ls
+
+%environment
+    export PATH=/opt/static/bin:$PATH
+    export LD_LIBRARY_PATH=/opt/static/lib
+
+    export NIM_PREFIX=/opt/nim
+    export PATH=$NIM_PREFIX/bin:$PATH
+    export NIM_PATH=$NIM_PREFIX/lib
+    export NIM_LIB_PREFIX=$NIM_PREFIX/lib
+    export NIMBLE_PATH=$NIM_PREFIX
+
+%runscript
+    exec "$@"

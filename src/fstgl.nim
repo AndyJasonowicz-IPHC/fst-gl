@@ -1,7 +1,8 @@
 import std/[times, os, math, sequtils, strformat, tables, enumerate, random]
-import options
-import strutils
+import std/options
+import std/strutils
 import zip/gzipfiles
+
 
 import hts
 
@@ -408,8 +409,6 @@ proc wgsFst(bcf: string,
              em_tol: float=1e-8, 
              max_iter:int=200, 
              verbosity: int=1): void =
-
-
     
     let pop_map = parse_pop_file(popfile)
 
@@ -573,7 +572,7 @@ when isMainModule:
         popfile: newStringArg(@["-p", "--pop-file"], help="File contining sample names and population labels"),
         out_prefix: newStringArg(@["-o", "--output"], help="Prefix for output files", defaultVal="out"),
         region: newStringArg(@["-r", "--region"], help="Specify a region to process [chr]:[start-stop].", defaultVal="*"),
-        remove_missing: newFlagArg(@["-m", "--remove-missing"], help="Remove samples with missing data? Requires DP field in BCF. [default: false]"),
+        allow_missing: newFlagArg(@["-m", "--allow-missing"], help="Allow samples with missing data? Requires DP field in BCF. [default: false]"),
         random_starts: newFlagArg(@["-s", "--random-starts"], help="Use random starting values for EM algorithm? [default: false]"),
         nboots: newIntArg(@["-b", "--boots"], help="Number of bootstrap resamplings", defaultVal=0),
         replace: newFlagArg(@["--replace"], help="Perform re-sampling with replacement? [default: false]"),
@@ -592,12 +591,14 @@ when isMainModule:
     spec.parseOrQuit(prolog = "fst-gl - a program to estimate FST from genotype likelihoods.")
     # If a help message or version was requested or a parse error generated it would be printed
     # and then the parser would call `quit`. Getting past `parseOrQuit` implies we're ok.
-    var remove_missing = false
+    var remove_missing = true
+    var allow_missing = false
     var random_starts = false
     var replace = false
 
-    if 0 < spec.remove_missing.count:
-        remove_missing = true
+    if 0 < spec.allow_missing.count:
+        remove_missing = false
+        allow_missing = true
 
     if 0 < spec.random_starts.count:
         random_starts = true
@@ -610,7 +611,7 @@ when isMainModule:
     echo "\t--pop-file={spec.popfile.value}".fmt
     echo "\t--output={spec.out_prefix.value}".fmt
     echo "\t--region={spec.region.value}".fmt
-    echo "\t--remove-missing={spec.remove_missing.count} ({remove_missing})".fmt
+    echo "\t--allow-missing={spec.allow_missing.count} ({allow_missing})".fmt
     echo "\t--random-starts={spec.random_starts.count} ({random_starts})".fmt
     echo "\t--boots={spec.nboots.value}".fmt
     echo "\t--replace={spec.replace.count} ({replace})".fmt
@@ -625,6 +626,8 @@ when isMainModule:
     omp_set_num_threads(cint(spec.threads.value))
     if 1 < spec.verbosity.count:
         echo "OMP_MAX_THREADS: {omp_get_max_threads()}".fmt
+
+
 
     wgsFst(bcf=spec.bcf.value, 
             popfile=spec.popfile.value,  

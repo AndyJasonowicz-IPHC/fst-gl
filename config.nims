@@ -1,8 +1,11 @@
 #
 # NimScript build file for Project X
 #
+import std/os
 
-# Switches
+when withDir(thisDir(), system.fileExists("nimble.paths")):
+  include "nimble.paths"
+
 switch("verbosity", "0")
 switch("hints", "off")
 
@@ -10,18 +13,25 @@ when defined(testing) :
   switch("verbosity", "1")
   switch("hints", "on")
 
-#
-# Tasks
-#
-task tests, "run the test":
-  exec "testament pat \"test*.nim\""
 
-task build, "build project":
-  ## Build new parallelized module
+task build, "Standard build (links against system htslib)":
   exec "mkdir -p bin"
-  exec "nimble install --depsOnly --verbose"
-  exec "nim c -f --cc:clang --exceptions:setjmp --debugger:native --debuginfo:on --linedir:on --threads:on --exceptions:setjmp -d:useMalloc -d:openmp -d:release -d:danger -d:speed -o:bin/fst-gl  src/fstgl.nim"
+  exec "nim c -f -o:bin/fst-gl src/fstgl.nim"
+
+task bundle, "Developer build (bundles your local htslib)":
+  exec "mkdir -p bin"
+  # -d:bundle flag here
+  exec "nim c -f -d:bundle -o:bin/fst-gl src/fstgl.nim"
+
+task release, "Portable build (bundled htslib + static compression)":
+  exec "mkdir -p bin"
+  # Bundles htslib AND triggers the static-compression logic
+  exec "nim c -f -d:release -o:bin/fst-gl src/fstgl.nim"
 
 task clean, "cleanup":
   exec "rm -rf nim_modules"
   exec "rm -rf bin"
+
+task fun, "Custom build task":
+  let args = commandLineParams()
+  echo "Arguments passed: ", args
