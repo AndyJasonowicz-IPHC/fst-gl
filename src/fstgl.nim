@@ -9,7 +9,7 @@ import hts
 when defined(openmp):
     ## use -d:openmp to complile multithreaded version 
     {.passC: "-fopenmp".}
-    {.passL: "-fopenmp".}
+    ##{.passL: "-fopenmp".}
 
     {. pragma: omp, header:"omp.h" .}
 

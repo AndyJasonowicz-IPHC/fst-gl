@@ -35,3 +35,7 @@ task clean, "cleanup":
 task fun, "Custom build task":
   let args = commandLineParams()
   echo "Arguments passed: ", args
+# begin Nimble config (version 2)
+when withDir(thisDir(), system.fileExists("nimble.paths")):
+  include "nimble.paths"
+# end Nimble config
