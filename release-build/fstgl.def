@@ -23,8 +23,7 @@ From: almalinux:8
         autoconf automake libtool \
         git curl tar gzip xz \
         zlib-devel bzip2-devel xz-devel \
-        perl pkgconfig \
-        libomp libomp-devel
+        perl pkgconfig
 
     dnf clean all
 

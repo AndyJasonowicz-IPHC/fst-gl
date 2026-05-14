@@ -6,14 +6,6 @@ import std/os
 when withDir(thisDir(), system.fileExists("nimble.paths")):
   include "nimble.paths"
 
-switch("verbosity", "0")
-switch("hints", "off")
-
-when defined(testing) :
-  switch("verbosity", "1")
-  switch("hints", "on")
-
-
 task build, "Standard build (links against system htslib)":
   exec "mkdir -p bin"
   exec "nim c -f -o:bin/fst-gl src/fstgl.nim"
@@ -31,11 +23,3 @@ task release, "Portable build (bundled htslib + static compression)":
 task clean, "cleanup":
   exec "rm -rf nim_modules"
   exec "rm -rf bin"
-
-task fun, "Custom build task":
-  let args = commandLineParams()
-  echo "Arguments passed: ", args
-# begin Nimble config (version 2)
-when withDir(thisDir(), system.fileExists("nimble.paths")):
-  include "nimble.paths"
-# end Nimble config

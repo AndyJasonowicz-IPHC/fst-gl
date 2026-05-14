@@ -10,6 +10,7 @@ We provide a binary that can be found in the [releases](https://github.com/AndyJ
 #### Prerequisites:
 * clang
 * OpenMP
+* [HTSlib](https://github.com/samtools/htslib)
 * nim 
 
 Install the prerequisites using your Linux distribution's package manager. For RPM based systems run.
@@ -34,9 +35,11 @@ Run ```nim build``` to compile an executable binary ```bin/fst-gl```.
 You can run ```nim clean``` to clean the build environment.
 
 #### Build Notes:
-HTSlib needs to be accessible on ```$LD_LIBRARY_PATH```. This can cause problems if it is 
-installed in a conda environment because it may cause conflicts with system gcc and libstdc++.  
-Here is one solution to this. We simply add the relevant path from our conda environment to ```$LD_LIBRARY_PATH```.
+When building from source HTSlib may need to be accessible on ```$LD_LIBRARY_PATH```. If you get an error that says ```could not load: libhts.so``` you may need to set your ```$LD_LIBRARY_PATH``` like this.
+```bash
+export LD_LIBRARY_PATH=/lib64:<path to directory that contains libhts.so>
+```
+If HTSlib is installed in a conda environment, we can add relevant path from our conda environment to ```$LD_LIBRARY_PATH```.
 ```bash
 export LD_LIBRARY_PATH=/lib64:$CONDA_PREFIX/lib/
 ```
