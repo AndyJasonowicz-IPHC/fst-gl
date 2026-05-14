@@ -10,13 +10,13 @@ We provide a binary that can be found in the [releases](https://github.com/AndyJ
 #### Prerequisites:
 * clang
 * OpenMP
-* [HTSlib](https://github.com/samtools/htslib)
 * nim 
 
 Install the prerequisites using your Linux distribution's package manager. For RPM based systems run.
 ```bash 
 dnf install -y clang libgomp 
 ```
+
 
 Install Nim following the instructions here https://nim-lang.org/install_unix.html.
 ```bash
@@ -32,7 +32,7 @@ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 #### Build Instructions
 The easiest way to build fst-gl is to run ```nimble bundle``` to compile an executable binary ```bin/fst-gl```. This will automatically download dependencies and statically link htslib and libdeflate.
 
-Run ```nimble build``` to compile an executable binary ```bin/fst-gl``` that dynamically links htslib. You may need to set ```$LD_LIBRARY_PATH``` if htslib is in a non standard location (see build notes).  
+Run ```nimble build``` to compile an executable binary ```bin/fst-gl``` that dynamically links htslib (you will need to install this on your own). You may need to set ```$LD_LIBRARY_PATH``` if htslib is in a non standard location (see [build notes](#build-notes)).  
 
 You can run ```nimble wipe``` to clean the build environment.
 
