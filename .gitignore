@@ -1,6 +1,0 @@
-nimble.develop
-nimble.paths
-static-build
-release-build
-bin
-test
