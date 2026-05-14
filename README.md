@@ -1,9 +1,9 @@
 # fst-gl
 
-A program to parse vcf/bcf files and estimate allele frequencies and fst using Phred-scaled genotype likelihoods (PL).
+A program to parse vcf/bcf files and estimate genotype and allele frequencies and fst using Phred-scaled genotype likelihoods (PL).
 
 ## Installation
-We provide a binary that can be found in the [releases](https://github.com/AndyJasonowicz-IPHC/fst-gl/releases). This release bundles htslib and the compression libraries needed to run ```fst-gl```. It does require OpenMP to be installed.
+We provide a binary that can be found in the [releases](https://github.com/AndyJasonowicz-IPHC/fst-gl/releases).
 
 ### Build from source
 ```fst-gl``` can be built from source as well.
@@ -30,14 +30,14 @@ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 
 
 #### Build Instructions
-The easiest way to build fst-gl is to run ```nimble bundle``` to compile an executable binary ```bin/fst-gl```. This will automatically download dependencies and statically link htslib and libdeflate.
+The easiest way to build fst-gl is to run ```nimble bundle``` to compile an executable binary ```bin/fst-gl```. This will automatically download dependencies and statically link HTSlib and libdeflate.
 
-Run ```nimble build``` to compile an executable binary ```bin/fst-gl``` that dynamically links htslib (you will need to install this on your own). You may need to set ```$LD_LIBRARY_PATH``` if htslib is in a non standard location (see [build notes](#build-notes)).  
+Run ```nimble build``` to compile an executable binary ```bin/fst-gl``` that dynamically links HTSlib (you will need to install this on your own). You may need to set ```$LD_LIBRARY_PATH``` if HTSlib is in a non standard location (see [build notes](#build-notes)).  
 
 You can run ```nimble wipe``` to clean the build environment.
 
 #### Build Notes:
-When building from source HTSlib may need to be accessible on ```$LD_LIBRARY_PATH```. If you get an error that says ```could not load: libhts.so``` you may need to set your ```$LD_LIBRARY_PATH``` like this.
+When building from source, HTSlib may need to be accessible on ```$LD_LIBRARY_PATH```. If you get an error that says ```could not load: libhts.so``` you may need to set your ```$LD_LIBRARY_PATH``` like this.
 ```bash
 export LD_LIBRARY_PATH=/lib64:<path to directory that contains libhts.so>
 ```
