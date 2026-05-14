@@ -79,5 +79,6 @@ task release, "Portable build":
 task wipe, "Cleanup":
   echo "Cleaning up build artifacts..."
   rmDir "bin"
+  rmDir "static-build"
   rmDir "nimcache"
   echo "Done."

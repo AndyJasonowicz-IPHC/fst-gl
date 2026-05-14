@@ -30,9 +30,11 @@ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 
 
 #### Build Instructions
-Run ```nim build``` to compile an executable binary ```bin/fst-gl```.  
+The easiest way to build fst-gl is to run ```nimble bundle``` to compile an executable binary ```bin/fst-gl```. This will automatically download dependencies and statically link htslib and libdeflate.
 
-You can run ```nim clean``` to clean the build environment.
+Run ```nimble build``` to compile an executable binary ```bin/fst-gl``` that dynamically links htslib. You may need to set ```$LD_LIBRARY_PATH``` if htslib is in a non standard location (see build notes).  
+
+You can run ```nimble wipe``` to clean the build environment.
 
 #### Build Notes:
 When building from source HTSlib may need to be accessible on ```$LD_LIBRARY_PATH```. If you get an error that says ```could not load: libhts.so``` you may need to set your ```$LD_LIBRARY_PATH``` like this.
@@ -65,7 +67,7 @@ Options:
   -o, --output=<output>          Prefix for output files [default: out]
   -r, --region=<region>          Specify a region to process [chr]:[start-stop].
                                  [default: *]
-  -m, --remove-missing           Remove samples with missing data? Requires DP
+  -m, --allow-missing            Allow samples with missing data? Requires DP
                                  field in BCF. [default: false]
   -s, --random-starts            Use random starting values for EM algorithm?
                                  [default: false]
@@ -87,17 +89,20 @@ Options:
 ```
 
 ## Usage notes
-If program failes to converge, try increasing --max-iter to 500 or even 1000, this may be helpful in cases where sequencing depth is very low.
+If program fails to converge, try increasing --max-iter to 500 or even 1000, this may be helpful in cases where sequencing depth is very low.
 
 ## Program Output
 ```fst-gl``` outputs two separate output files. One contains the _F<sub>ST</sub>_ estimates and the other contains the allele and genotype frequency estimates for each population. By default, these files are named 'out-af.txt.gz' and 'out-fst.txt.gz', this can be changed by using  the ```--output``` option.  
 
-If we run the command on the test data (provided in the test directory)
-```./bin/fst-gl -t 2 --output test/test --pop-file test/popfile.txt test/allpops.bcf```
+If we run the command on the test data (provided in the test directory). Note we can provide the ```-v``` flag multiple times to see additional output that may be useful to us.
+```bash
+mkdir test
+./bin/fst-gl -t 2 -vvv --output test/test-results --pop-file example-data/popfile.txt example-data/allpops.bcf
+```
 
 The fst output is shown here
 ```bash
-zcat test/test-fst.txt.gz | head | column -t
+zcat test/test-results-fst.txt.gz | head | column -t
 ```
 
 ```
@@ -122,10 +127,12 @@ chr1   17748  0.049507   0.012100   0.012368   0.219931  true
 |b | b from wc 84  |
 |c | c from wc 84  |
 |all_converged | did the EM algorithm converge for all populations?  |
+|p | p-value only if ```--boots``` is used|
+|converged_boots | number of resamplings in which EM algorithm converged for all populations (this value is used for p-value calculation) |
 
-
-```
-zcat test/test-af.txt.gz | head | column -t
+The allele and heterozygosity estimates are shown here
+```bash
+zcat test/test-results-af.txt.gz | head | column -t
 ```
 ```
 chrom  pos   pop  n   ngood  mleaf     mlegf                       converged  n_iter  starts
