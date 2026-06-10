@@ -3,7 +3,7 @@
 A program to parse vcf/bcf files and estimate genotype and allele frequencies and fst using Phred-scaled genotype likelihoods (PL).
 
 ## Installation
-We provide a binary that can be found in the [releases](https://github.com/AndyJasonowicz-IPHC/fst-gl/releases).
+We provide a binary that can be found in the [releases](https://github.com/AndyJasonowicz-IPHC/fst-gl/releases). You may need to make the binary file executable first by running ```chmod +x fst-gl``` before first use. 
 
 ### Build from source
 ```fst-gl``` can be built from source as well.
