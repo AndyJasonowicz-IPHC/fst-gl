@@ -17,7 +17,6 @@ Install the prerequisites using your Linux distribution's package manager. For R
 dnf install -y clang libgomp 
 ```
 
-
 Install Nim following the instructions here https://nim-lang.org/install_unix.html.
 ```bash
 curl https://nim-lang.org/choosenim/init.sh -sSf | sh
@@ -30,9 +29,9 @@ curl https://nim-lang.org/choosenim/init.sh -sSf | sh
 
 
 #### Build Instructions
-The easiest way to build fst-gl is to run ```nimble bundle``` to compile an executable binary ```bin/fst-gl```. This will automatically download dependencies and statically link HTSlib and libdeflate.
+The easiest way to build fst-gl is to run ```nimble bundle``` to compile an executable binary ```bin/fst-gl```. This will automatically download dependencies and _statically link_ HTSlib and libdeflate.
 
-Run ```nimble build``` to compile an executable binary ```bin/fst-gl``` that dynamically links HTSlib (you will need to install this on your own). You may need to set ```$LD_LIBRARY_PATH``` if HTSlib is in a non standard location (see [build notes](#build-notes)).  
+Running ```nimble build``` will compile an executable binary ```bin/fst-gl``` that _dynamically links_ HTSlib (you will need to install this on your own). You may need to set ```$LD_LIBRARY_PATH``` if HTSlib is in a non standard location (see [build notes](#build-notes)).  
 
 You can run ```nimble wipe``` to clean the build environment.
 
