@@ -104,7 +104,7 @@ We include a BCF file (```allpops.bcf```) that consists of 50 individuals random
 ```fst-gl``` requires VCF/BCF files that contain Phred-scaled genotype likelihoods stored in the PL field. A tab delimited file that describes what population each individual belongs to is also required to be supplied using the ```--pop-file``` option. The first column of the pop file specifies the individual sample ID that is stored in the VCF file and the second is the population that individual belongs to.
 
 ```bash
-head -n 3 example-data/popfile.txt
+head -n 3 example-data/example-popfile.txt
 ```
 The file should be structured like this.
 ```
