@@ -137,7 +137,7 @@ chr1   34790  0.419278   0.115286   -0.019269  0.178947  true
 chr1   42432  -0.007220  -0.001374  0.023514   0.168183  true
 ```
 <details>
-<summary>Click to expand table describing columns of  _F<sub>ST</sub>_ output</summary>
+<summary>Click to expand table describing columns of  <em>F<sub>ST</sub></em> output</summary>
 
 |Column | Description| 
 |---|---|
